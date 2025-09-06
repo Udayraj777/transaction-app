@@ -151,4 +151,56 @@ router.get('/bulk',authMiddleware,async(req,res)=>{
     });
 });
 
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    // Check if userId exists from auth middleware
+    if (!req.userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+        code: "AUTH_REQUIRED"
+      });
+    }
+
+    // Find user and exclude sensitive fields
+    const user = await User.findById(req.userId).select('-password -__v');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        code: "USER_NOT_FOUND"
+      });
+    }
+
+    // Success response
+    res.status(200).json({
+      success: true,
+      message: "User fetched successfully",
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in /me endpoint:', error);
+    
+    // Handle different types of errors
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID format",
+        code: "INVALID_USER_ID"
+      });
+    }
+    
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      code: "SERVER_ERROR"
+    });
+  }
+});
+
 module.exports = router;
