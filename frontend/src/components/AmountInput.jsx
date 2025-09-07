@@ -3,7 +3,7 @@ const AmountInput = ({ value, onChange, placeholder = "Enter amount" }) => {
     <div className="mb-6">
       {/* Label */}
       <label className="block text-sm font-medium text-gray-700 mb-2">
-        Amount (in Rs)
+        Amount (in $)
       </label>
       
       {/* Input Field */}
